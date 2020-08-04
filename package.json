@@ -1,0 +1,19 @@
+{
+  "name": "radio-proxy",
+  "version": "0.0.1",
+  "description": "node.js proxy server for streaming shoutcast / icecast style audio and passing now-playing info to clients via socket.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pfbrowning/radio-proxy.git"
+  },
+  "author": "Patrick Browning",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pfbrowning/radio-proxy/issues"
+  },
+  "homepage": "https://github.com/pfbrowning/radio-proxy#readme"
+}
