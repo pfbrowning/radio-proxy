@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/pfbrowning/radio-proxy/issues"
   },
-  "homepage": "https://github.com/pfbrowning/radio-proxy#readme"
+  "homepage": "https://github.com/pfbrowning/radio-proxy#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "icecast-parser": "^3.2.1"
+  }
 }
