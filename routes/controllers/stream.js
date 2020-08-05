@@ -1,6 +1,7 @@
 const icecastParser = require('icecast-parser');
 
 exports.apiGET = function (req, res) {
+    console.log('request received for', req.query.url);
     let myStream;
     // Use http://localhost:3000/stream?url=http%3A%2F%2F188.165.212.92%3A8000%2Fheavy128mp3 in your browser
     const radioStation = new icecastParser({
@@ -21,7 +22,7 @@ exports.apiGET = function (req, res) {
     });
 
     radioStation.on('metadata', function(metadata) {
-        console.log([metadata.StreamTitle, 'is playing on', req.query.url].join(' '));
+        console.log(metadata);
     });
 
     radioStation.on('stream', function(stream) {
@@ -38,7 +39,7 @@ exports.apiGET = function (req, res) {
 
     // Destroy the stream when the client closes the browser so we don't continue using bandwidth
     req.on('close', function () {
-        myStream.destroy();
+        myStream && myStream.destroy();
         console.log('Client closed the connection');
     });
 }
