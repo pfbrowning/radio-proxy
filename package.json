@@ -20,7 +20,9 @@
   "dependencies": {
     "express": "^4.17.1",
     "icecast-parser": "^3.2.1",
+    "lodash": "^4.17.19",
     "nodemon": "^2.0.4",
+    "rxjs": "^6.6.2",
     "socket.io": "^2.3.0"
   }
 }

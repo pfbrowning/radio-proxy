@@ -1,4 +1,5 @@
 const icecastParser = require('icecast-parser');
+const messenger = require('../../services/messenger');
 
 exports.apiGET = function (req, res) {
     console.log('request received for', req.query.url);
@@ -23,6 +24,10 @@ exports.apiGET = function (req, res) {
 
     radioStation.on('metadata', function(metadata) {
         console.log(metadata);
+        messenger.metadataReceived.next({
+            url: req.query.url,
+            title: metadata.StreamTitle
+        });
     });
 
     radioStation.on('stream', function(stream) {

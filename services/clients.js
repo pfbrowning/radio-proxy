@@ -1,29 +1,53 @@
-let clients = {};
+const messenger = require('./messenger');
+const { filter } = require('rxjs/operators');
+const { uniq } = require('lodash');
+
+let connectedClients = {};
 
 /**
  * 
  * @param {SocketIO.Socket} client 
  */
-exports.onClientConnected = (client) => {
-    clients = {
-        ...client,
-        [client.id]: client
+exports.initializeClient = (client) => {
+    let streamUrls = [];
+    const metadataSubscription = messenger.metadataReceived.pipe(
+        filter(m => streamUrls.includes(m.url))
+    ).subscribe(m => {
+        client.emit('metadata', m.url, m.title);
+    })
+    connectedClients = {
+        ...connectedClients,
+        [client.id]: {
+            client,
+            streamUrls,
+            metadataSubscription
+        }
     };
     console.log('connected', client.id);
-    client.on('disconnect', () => onClientDisconnected(client));
+    client.on('disconnect', () => {
+        const clientUrls = streamUrls;
+        metadataSubscription.unsubscribe();
+        delete connectedClients[client.id];
+        const noLongerConnected = negativeJoinCurrentClientStreams(clientUrls);
+        messenger.clientDisconnectedFromStreams.next(noLongerConnected);
+    });
 
-    client.on('streamConnect', data => console.log('event', data));
+    client.on('setStreams', streams => {
+        const uniqueNew = uniq(streams);
+        const notYetConnected = negativeJoinCurrentClientStreams(uniqueNew);
+        streamUrls = uniqueNew;
+        console.log('stream subscribed', uniqueNew, notYetConnected);
+        messenger.clientConnectedToStreams.next(notYetConnected);
+    });
 }
 
-
-/**
- * 
- * @param {SocketIO.Socket} client 
- */
-const onClientDisconnected = (client) => {
-    delete clients[client.id];
+const negativeJoinCurrentClientStreams = (urls) => {
+    const current = getCurrentClientStreams();
+    return urls.filter(url => !current.includes(url));
 }
 
-const onStreamSubscribed = (client, data) => {
-    console.log('stream subscribed', client.id, data);
+const getCurrentClientStreams = () => {
+    const flattened = Object.values(connectedClients)
+        .reduce((prev, current) => prev.push(current.streamUrls), []);
+    return uniq(flattened);
 }
