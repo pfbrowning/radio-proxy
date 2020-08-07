@@ -1,5 +1,5 @@
 const messenger = require('./messenger');
-const { filter } = require('rxjs/operators');
+const { filter, tap } = require('rxjs/operators');
 const { uniq } = require('lodash');
 
 let connectedClients = {};
@@ -36,7 +36,7 @@ exports.initializeClient = (client) => {
         const uniqueNew = uniq(streams);
         const notYetConnected = negativeJoinCurrentClientStreams(uniqueNew);
         streamUrls = uniqueNew;
-        console.log('stream subscribed', uniqueNew, notYetConnected);
+        console.log('stream subscribed', streamUrls, streams, uniqueNew, notYetConnected);
         messenger.clientConnectedToStreams.next(notYetConnected);
     });
 }
@@ -47,7 +47,12 @@ const negativeJoinCurrentClientStreams = (urls) => {
 }
 
 const getCurrentClientStreams = () => {
+    // console.log('get current streams', connectedClients);
     const flattened = Object.values(connectedClients)
-        .reduce((prev, current) => prev.push(current.streamUrls), []);
+        .reduce((prev, current) => {
+            console.log('pushing', prev, current.streamUrls);
+            
+            return prev.concat(current.streamUrls);
+        }, []);
     return uniq(flattened);
 }
