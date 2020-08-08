@@ -1,6 +1,7 @@
 const express = require('express')
 const routes = require('./routes/routes')
 const clients = require('./services/clients');
+const poller = require('./services/polling');
 
 // Configuration via environment variables
 const port = process.env.PORT || 3000

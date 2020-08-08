@@ -1,39 +1,46 @@
-const { Subject, merge } = require('rxjs');
-const { startWith, distinctUntilChanged, filter } = require('rxjs/operators');
+const { Subject, BehaviorSubject, merge } = require('rxjs');
+const { startWith, distinctUntilChanged, filter, tap, map, share } = require('rxjs/operators');
 const { uniq, isEqual } = require('lodash');
 
-const clientConnectedToStreams = new Subject();
-const clientDisconnectedFromStreams = new Subject();
 const metadataReceived = new Subject();
 
-const currentlyPolling = [];
-const currentlyStreaming = new Map();
+// Root Sync State
 const lastKnownMetadata = new Map();
-const clientUrls = new Map();
+
+// Root Async State
+const currentlyStreamingSource = new BehaviorSubject(new Map());
+const clientUrlsSource = new BehaviorSubject(new Map());
+
+// Derived Async State
+exports.currentStreamingUrls$ = currentlyStreamingSource.pipe(
+    map(map => [...map.keys()]),
+    share()
+)
+exports.currentClientUrls$ = clientUrlsSource.pipe(
+    map(clientUrlsMap => getCurrentClientStreams(clientUrlsMap)),
+    share()
+)
 
 // State Write Operations ------------
 exports.notifyStreamConnected = (url, streamId) => {
-    if (!currentlyStreaming.has(url)) {
-        currentlyStreaming.set(url, [ streamId ]);
-        // TODO Notify that we started to stream on this url
-        console.log('started to stream', url, streamId);
-    } else {
-        const current = currentlyStreaming.get(url);
-        currentlyStreaming.set(url, current.concat(streamId));
-    }
+    const newStreamArray = (currentlyStreamingSource.value.get(url) || []).concat(streamId);
+    /* Next up the source with a clone of the map with the new value
+    https://stackoverflow.com/questions/57883677/how-to-immutably-update-a-map-in-javascript */
+    currentlyStreamingSource.next(new Map(currentlyStreamingSource.value).set(url, newStreamArray));
 };
 
 exports.notifyStreamDisconnected = (url, streamId) => {
-    // Update the map to reflect that this particular stream is no longer listening to this url
-    const current = currentlyStreaming.get(url).filter(u => u !== streamId);
-    currentlyStreaming.set(url, current);
-
-    // If no stream is listening on the URL, then delete the key
-    if (currentlyStreaming.get(url).length === 0) {
-        currentlyStreaming.delete(url);
-        // TODO Notify that we're no longer streaming this URL
-        console.log('closed stream', url, streamId);
+    // Create a new map which reflects that this particular stream is no longer listening to this url
+    const newStreamArray = currentlyStreamingSource.value.get(url).filter(u => u !== streamId);
+    const newMap = new Map(currentlyStreamingSource.value);
+    if (newStreamArray.length > 0) {
+        newMap.set(url, newStreamArray);
+    } else {
+        newMap.delete(url);
     }
+
+    currentlyStreamingSource.next(newMap);
+
     /* TODO If there are no clients listening to this URL, then 
     delete it from lastKnownMetadata. */
 }
@@ -41,29 +48,22 @@ exports.notifyStreamDisconnected = (url, streamId) => {
 exports.notifyMetadataReceived = (url, title) => {
     lastKnownMetadata.set(url, title);
     metadataReceived.next({ url, title });
-    console.log('metadata set', lastKnownMetadata);
 }
 
 exports.notifyClientConnected = (clientId) => {
-    clientUrls.set(clientId, []);
+    const newMap = new Map(clientUrlsSource.value).set(clientId, []);
+    clientUrlsSource.next(newMap);
 }
 
 exports.notifyClientDisconnected = (clientId) => {
-    const urlsForDisconnectingClient = clientUrls.get(clientId);
-    clientUrls.delete(clientId);
-    const disconnectedUrls = negativeJoinCurrentClientStreams(urlsForDisconnectingClient);
-    /* TODO Notify that nobody is listening on disconnectedUrls anymore so that any polling
-    operations for those URLs can be cancelled. */
+    const newMap = new Map(clientUrlsSource.value);
+    newMap.delete(clientId);
+    clientUrlsSource.next(newMap);
 }
 
 exports.notifyClientUrlsSet = (clientId, setUrls) => {
-    const uniqueSetUrls = uniq(setUrls);
-    const newUrls = negativeJoinCurrentClientStreams(uniqueSetUrls);
-    const urlsBeforeSet = getCurrentClientStreams();
-    clientUrls.set(clientId, uniqueSetUrls);
-    const disconnectedUrls = negativeJoinCurrentClientStreams(urlsBeforeSet);
-    /* TODO Notify listeners that new URLs were set and that old URLs were disconnected
-    so that polling operations can be started and stopped respectively. */
+    const newMap = new Map(clientUrlsSource.value).set(clientId, uniq(setUrls));
+    clientUrlsSource.next(newMap);
 }
 
 // Observable Factories ------
@@ -83,12 +83,7 @@ exports.observeMetadataForManyUrls = (urls) => {
 };
 
 // State Queries --------
-const negativeJoinCurrentClientStreams = (urls) => {
-    const current = getCurrentClientStreams();
-    return urls.filter(url => !current.includes(url));
-}
-
-const getCurrentClientStreams = () => {
-    const flattened = [...clientUrls.values()].reduce((prev, current) => prev.concat(current), []);
+const getCurrentClientStreams = (clientUrlsMap) => {
+    const flattened = [...clientUrlsMap.values()].reduce((prev, current) => prev.concat(current), []);
     return uniq(flattened);
 }

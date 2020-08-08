@@ -14,9 +14,6 @@ exports.initializeClient = (client) => {
         state.notifyClientUrlsSet(client.id, urls);
         metadataSubscription && metadataSubscription.unsubscribe();
         metadataSubscription = state.observeMetadataForManyUrls(urls)
-            .subscribe(metadata => {
-                console.log('client received', metadata);
-                client.emit('metadata', metadata.url, metadata.title);
-            })
+            .subscribe(metadata => client.emit('metadata', metadata.url, metadata.title))
     });
 }
