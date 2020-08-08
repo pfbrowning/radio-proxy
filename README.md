@@ -4,7 +4,6 @@ node.js proxy server for streaming shoutcast / icecast style audio and passing n
 This is still an early POC.  I'll write a proper readme once the project is closer to completion.
 
 TODO
-* Deploy to Heroku
 * Configure GH Actions pipeline
 * Lock down by origin
 * Logging
