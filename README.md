@@ -5,8 +5,8 @@ This is still an early POC.  I'll write a proper readme once the project is clos
 
 TODO
 * Configure GH Actions pipeline
-* Authenticate SocketIO connection ([like this](https://github.com/auth0-community/auth0-socketio-jwt)?)
 * Authenticate stream proxy endpoint - perhaps with a short-lived key required in the URL?
+* SetStreams via auth-guarded POST (rather than socket connection)
 * Logging
 * Finish TODO comments throughout the code
 * Refactor as necessary
