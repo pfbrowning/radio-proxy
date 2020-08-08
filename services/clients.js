@@ -10,10 +10,11 @@ exports.initializeClient = (client) => {
         metadataSubscription && metadataSubscription.unsubscribe();
     });
 
-    client.on('setStreams', urls => {
+    client.on('setStreams', (urls, ack) => {
         state.notifyClientUrlsSet(client.id, urls);
         metadataSubscription && metadataSubscription.unsubscribe();
         metadataSubscription = state.observeMetadataForManyUrls(urls)
-            .subscribe(metadata => client.emit('metadata', metadata.url, metadata.title))
+            .subscribe(metadata => client.emit('metadata', metadata.url, metadata.title));
+        ack();
     });
 }
