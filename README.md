@@ -6,6 +6,8 @@ This is still an early POC.  I'll write a proper readme once the project is clos
 TODO
 * Deploy to Heroku
 * Configure GH Actions pipeline
+* Lock down by origin
+* Logging
 * Finish TODO comments throughout the code
 * Refactor as necessary
 * Configure linting via `standard`

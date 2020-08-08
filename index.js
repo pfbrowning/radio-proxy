@@ -12,7 +12,7 @@ const io = require('socket.io')(server);
 
 io.on('connection', client => clients.initializeClient(client));
 
-server.listen(3000);
+server.listen(port);
 
 // Connect imported routes to Express
 app.use('/', routes)
