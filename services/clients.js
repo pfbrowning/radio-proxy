@@ -1,7 +1,7 @@
 const state = require('./state');
+const logger = require('./logging');
 
 exports.initializeClient = (client) => {
-    console.log('initializing', client.id);
     let metadataSubscription;
 
     state.notifyClientConnected(client.id);
@@ -12,11 +12,13 @@ exports.initializeClient = (client) => {
     });
 
     client.on('setStreams', (urls, ack) => {
-        console.log('setStreams', urls);
         state.notifyClientUrlsSet(client.id, urls);
         metadataSubscription && metadataSubscription.unsubscribe();
         metadataSubscription = state.observeMetadataForManyUrls(urls)
-            .subscribe(metadata => client.emit('metadata', metadata.url, metadata.title));
+            .subscribe(({url, title}) => {
+                client.emit('metadata', url, title);
+                logger.debug('Metadata Sent To Client', {url, title});
+            });
         ack();
     });
 

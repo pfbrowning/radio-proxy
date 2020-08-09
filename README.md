@@ -4,8 +4,7 @@ node.js proxy server for streaming shoutcast / icecast style audio and passing n
 This is still an early POC.  I'll write a proper readme once the project is closer to completion.
 
 TODO
-* Handle stream failure
-* Logging
+* HTTP Request logging (Morgan?)
 ***
 * Configure linting via `standard`
 * Configure Jasmine

@@ -31,14 +31,11 @@ nonStreamingClientUrlsAdded$.subscribe(urls => {
     urls.forEach(url => pollStationOnInterval(url, 60000).subscribe(meta => state.notifyMetadataReceived(url, meta)))
 })
 
-const pollStationOnInterval = (url, interval) => of(null).pipe(
-    tap(() => console.log('start interval', url)),
-    switchMap(() => timer(0, interval)),
+const pollStationOnInterval = (url, interval) => timer(0, interval).pipe(
     exhaustMap(() => getCurrentMetadata(url)),
     takeUntil(nonStreamingClientUrlsRemoved$.pipe(
         filter(removed => removed.includes(url)),
-    )),
-    finalize(() => console.log('finalize interval', url))
+    ))
 )
 
 const getCurrentMetadata = (url) => Observable.create(observer => {
