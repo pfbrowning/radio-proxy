@@ -3,9 +3,11 @@ const configService = require('./config');
 require('winston-daily-rotate-file');
 
 const transports = [
-  new winston.transports.Console({
-      handleExceptions: true,
-      level: configService.isProduction ? 'info' : 'debug'
+    // Write to stdout for local debugging via console and for Heroku logging
+    new winston.transports.Console({
+        handleExceptions: true,
+        // Use 'info' for the deployed app on Heroku and 'debug' for local debugging
+        level: configService.isProduction ? 'info' : 'debug'
     })
 ]
 
@@ -20,6 +22,7 @@ if (!configService.isProduction) {
 }
 
 const format = winston.format.combine(
+    winston.format.colorize(),
     winston.format.timestamp(),
     winston.format.simple()
 );

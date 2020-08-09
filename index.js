@@ -6,6 +6,7 @@ const poller = require('./services/polling');
 const auth = require('./services/authentication');
 const cors = require('./middlewares/cors');
 const logger = require('./services/logging');
+const httpRequestLogger = require('./middlewares/http-request-logger');
 
 // Configuration via environment variables
 const port = process.env.PORT || 3000
@@ -27,6 +28,6 @@ if (auth.authConfigured()) {
 app.use(cors);
 
 // Connect imported routes to Express
-app.use('/', routes)
+app.use('/', httpRequestLogger, routes)
 
 logger.info('Server Initialized');
