@@ -1,4 +1,5 @@
+const proxyKey = require('../../services/proxy-key');
 
 exports.apiPOST = (req, res) => {
-    res.status(200).json({myNameIs: 'derp'});
+    res.status(201).json({proxyKey: proxyKey.generate()});
 }

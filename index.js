@@ -4,6 +4,7 @@ const socketioJwt = require('socketio-jwt');
 const clients = require('./services/clients');
 const poller = require('./services/polling');
 const auth = require('./services/authentication');
+const cors = require('./middlewares/cors');
 
 // Configuration via environment variables
 const port = process.env.PORT || 3000
@@ -21,6 +22,8 @@ if (auth.authConfigured()) {
 } else {
     io.on('connection', socket => clients.initializeClient(socket));
 }
+
+app.use(cors);
 
 // Connect imported routes to Express
 app.use('/', routes)
