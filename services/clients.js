@@ -17,7 +17,7 @@ exports.initializeClient = (client) => {
         metadataSubscription && metadataSubscription.unsubscribe();
         metadataSubscription = state.observeMetadataForManyUrls(urls)
             .subscribe(({url, title}) => {
-                client.emit('metadata', url, title);
+                client.emit('metadata', {url, title});
                 logger.debug('Metadata Sent To Client', {url, title});
             });
     });
