@@ -11,8 +11,10 @@ TODO
 * Finish TODO comments throughout the code
 * Refactor as necessary
 * Stream validation / PLS reader
+* Include extra context from the stream's response headers along with the stream title
+* Investigate audio stream buffering?
 * Should we be using rooms?
-* Investigate audio stream buffering
+* Should we be using redis?
 * Middlewares
 * URL Validation on stream endpoint
 * Consistent API responses
