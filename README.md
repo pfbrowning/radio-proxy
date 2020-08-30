@@ -4,6 +4,7 @@ node.js proxy server for streaming shoutcast / icecast style audio and passing n
 This is still an early POC.  I'll write a proper readme once the project is closer to completion.
 
 TODO
+* Log to AppInsights
 * Gitignored local config
 * Configure linting via `standard`
 * Configure Jasmine
@@ -19,3 +20,4 @@ TODO
 * Code coverage badge
 * Write unit tests
 * Write readme
+* Set keywords
