@@ -13,9 +13,9 @@ const port = process.env.PORT || 3000
 
 const app = express()
 const server = require('http').createServer(app);
-const io = require('socket.io')(server);
+const io = require('socket.io')(server, { cookie: false });
 
-server.listen(port, { cookie: false });
+server.listen(port);
 
 // Require authentication on each socket before initializing if configured to do so.
 if (auth.authConfigured()) {
