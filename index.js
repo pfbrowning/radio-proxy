@@ -15,7 +15,7 @@ const app = express()
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
-server.listen(port);
+server.listen(port, { cookie: false });
 
 // Require authentication on each socket before initializing if configured to do so.
 if (auth.authConfigured()) {
