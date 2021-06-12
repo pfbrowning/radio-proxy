@@ -13,7 +13,7 @@ const port = process.env.PORT || 3000
 
 const app = express()
 const server = require('http').createServer(app);
-const io = require('socket.io')(server, { cookie: false });
+const io = require('socket.io')(server, { cookie: false, origins: '*:*'});
 
 server.listen(port);
 
