@@ -31,7 +31,7 @@ exports.notifyStreamConnected = (url, streamId) => {
 
 exports.notifyStreamDisconnected = (url, streamId) => {
     // Create a new map which reflects that this particular stream is no longer listening to this url
-    const newStreamArray = currentlyStreamingSource.value.get(url).filter(u => u !== streamId);
+    const newStreamArray = (currentlyStreamingSource.value.get(url) || []).filter(u => u !== streamId);
     const newMap = new Map(currentlyStreamingSource.value);
     if (newStreamArray.length > 0) {
         newMap.set(url, newStreamArray);

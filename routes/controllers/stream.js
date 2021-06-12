@@ -1,6 +1,7 @@
 const icy = require('icy');
 const { v4: uuid } = require('uuid');
 const state = require('../../services/state');
+const logger = require('../../services/logging');
 const authenticationService = require('../../services/authentication');
 const proxyKeyService = require('../../services/proxy-key');
 
@@ -9,7 +10,7 @@ exports.apiGET = function (req, res) {
     if (authenticationService.authConfigured() && !proxyKeyService.validate(req.query.key)) {
         return res.status(401).json({error: "Valid Proxy Key Required"});
     }
-    icy.get(req.query.url, icyResponse => {
+    const icyClient = icy.get(req.query.url, icyResponse => {
         state.notifyStreamConnected(req.query.url, requestId);
 
         icyResponse.on('metadata', (metadata) => {
@@ -19,6 +20,12 @@ exports.apiGET = function (req, res) {
 
         res.set('content-type', icyResponse.headers['content-type']);
         icyResponse.pipe(res);
+    });
+
+    icyClient.on('error', (error) => {
+        const statusCode = error.code === 'ECONNREFUSED' ? 503 : 500;
+        logger.error('icy client error', error);
+        return res.status(statusCode).json();
     });
     
     req.on('close', () => {
