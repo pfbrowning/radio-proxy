@@ -3,7 +3,13 @@ node.js proxy server for streaming shoutcast / icecast style audio and passing n
 
 This is still an early POC.  I'll write a proper readme once the project is closer to completion.
 
-TODO
+# Backlog
+## 
+* Upgrade Socket.IO
+    * Upgrade to 3
+    * Upgrade to 4
+* Use Typescript
+* Remove stateful logic
 * Return a more appropriate HTTP status code for stations which no longer exist or otherwise fail to play
 * Log to AppInsights
 * Gitignored local config
