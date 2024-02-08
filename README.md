@@ -8,6 +8,7 @@ This is still an early POC.  I'll write a proper readme once the project is clos
 * Upgrade Socket.IO
     * Upgrade to 3
     * Upgrade to 4
+* Upgrade the other dependencies
 * Use Typescript
 * Remove stateful logic
 * Return a more appropriate HTTP status code for stations which no longer exist or otherwise fail to play
