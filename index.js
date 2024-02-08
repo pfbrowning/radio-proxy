@@ -7,6 +7,7 @@ const auth = require('./services/authentication');
 const cors = require('./middlewares/cors');
 const logger = require('./services/logging');
 const httpRequestLogger = require('./middlewares/http-request-logger');
+const config = require('./services/config');
 
 // Configuration via environment variables
 const port = process.env.PORT || 3000
@@ -14,6 +15,20 @@ const port = process.env.PORT || 3000
 const app = express()
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, { cookie: false, origins: '*:*'});
+
+// TODO Use https://github.com/Thream/socketio-jwt for authentication
+// const client = jwksClient({
+//     jwksUri: `${config.auth.issuer}.well-known/jwks.json`,
+//   })
+  
+// io.use(
+// authorize({
+//     secret: async (decodedToken) => {
+//     const key = await client.getSigningKeyAsync(decodedToken.header.kid)
+//     return key.getPublicKey()
+//     },
+// }),
+// )
 
 server.listen(port);
 
