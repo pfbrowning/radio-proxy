@@ -1,7 +1,9 @@
 const cors = require('cors')
-const configService = require('../services/config');
 
-if (configService.allowedCorsOrigins) {
+const fromEnv = process.env.allowedCorsOrigins;
+
+let allowedCorsOrigins = fromEnv && fromEnv.split(',') || [];
+if (allowedCorsOrigins.length > 0) {
   module.exports = cors({ origin: allowedCorsOrigins })
 } else {
   module.exports = cors()
