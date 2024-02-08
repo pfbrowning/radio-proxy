@@ -18,7 +18,6 @@ exports.apiGET = function (req, res) {
             state.notifyMetadataReceived(req.query.url, parsed.StreamTitle);
         });
 
-        res.set('content-type', icyResponse.headers['content-type']);
         icyResponse.pipe(res);
     });
 
