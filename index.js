@@ -6,6 +6,7 @@ const poller = require('./services/polling');
 const auth = require('./services/authentication');
 const cors = require('./middlewares/cors');
 const logger = require('./services/logging');
+const config = require('./services/config');
 const httpRequestLogger = require('./middlewares/http-request-logger');
 
 // Configuration via environment variables
@@ -13,7 +14,8 @@ const port = process.env.PORT || 3000
 
 const app = express()
 const server = require('http').createServer(app);
-const io = require('socket.io')(server, { cookie: false, origins: '*:*'});
+
+const io = require('socket.io')(server, { cookie: false, cors: { origin: config.allowedCorsOrigins ?? '*' }});
 
 server.listen(port);
 
